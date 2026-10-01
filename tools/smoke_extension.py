@@ -55,7 +55,16 @@ with sync_playwright() as p:
     with popup.expect_download() as download_info:
         popup.get_by_role('button',name='진단 파일 저장').click()
     downloaded=json.loads(Path(download_info.value.path()).read_text(encoding='utf-8'))
-    assert downloaded==report
+    assert downloaded['structure']==report['structure'] and downloaded['parseStatus']=='needs_inspection'
+    actual=json.loads(Path('tests/fixtures/korail-public-rows.json').read_text(encoding='utf-8'))
+    actual.update(rows=[],documentEpoch=1)
+    popup.evaluate('data=>{window.probeData=data;window.probeReloads=0;chrome.tabs.reload=async()=>{window.probeReloads++;window.probeData.documentEpoch=2;};chrome.scripting.executeScript=async()=>[{result:structuredClone(window.probeData)}];}',actual)
+    popup.get_by_role('button',name='현재 목록 읽기').click()
+    expect(popup.locator('#status')).to_contain_text('열차 4편')
+    expect(popup.locator('#targets')).to_contain_text('08:20 · 411편')
+    popup.get_by_role('button',name='갱신 1회 시험').click()
+    expect(popup.locator('#status')).to_contain_text('새로 열린 문서',timeout=5000)
+    assert popup.evaluate('window.probeReloads')==1
     Path('.artifacts').mkdir(exist_ok=True)
     popup.screenshot(path='.artifacts/extension-popup.png',full_page=True)
     browser.close()

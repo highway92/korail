@@ -1,0 +1,907 @@
+{
+  "conditions": {
+    "arrival": "정읍",
+    "date": "2026-10-09(금) 08:00",
+    "departure": "용산",
+    "passengers": "총 1명"
+  },
+  "ok": true,
+  "schemaVersion": 1,
+  "source": "https://www.korail.com/ticket/search/list",
+  "status": "readable",
+  "structure": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "children": [],
+                                        "classes": [
+                                          "blind"
+                                        ],
+                                        "tag": "span",
+                                        "text": "KTX-산천"
+                                      }
+                                    ],
+                                    "classes": [
+                                      "train_sancheon_ticket"
+                                    ],
+                                    "tag": "span",
+                                    "text": ""
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "num"
+                                    ],
+                                    "tag": "span",
+                                    "text": "411"
+                                  }
+                                ],
+                                "classes": [
+                                  "flag_wrap",
+                                  "type2"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [
+                              "tit_box",
+                              "type02"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          },
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "용산"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "정읍"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "( 08:20 ~ 09:50 )"
+                                  }
+                                ],
+                                "classes": [
+                                  "txt_bk"
+                                ],
+                                "tag": "h3",
+                                "text": "→"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "s_txt"
+                                ],
+                                "tag": "p",
+                                "text": "소요시간 : 1시간 30분"
+                              }
+                            ],
+                            "classes": [
+                              "data_box",
+                              "right"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "info_box"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "info_inner",
+                      "fl-l"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "tck_etc_use"
+                                    ],
+                                    "tag": "div",
+                                    "text": "매진"
+                                  }
+                                ],
+                                "classes": [
+                                  "tck_etc_text"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "sold_out"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "tck_etc_use"
+                                    ],
+                                    "tag": "div",
+                                    "text": "매진"
+                                  }
+                                ],
+                                "classes": [
+                                  "tck_etc_text"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "sold_out"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "tck_inner"
+                ],
+                "tag": "div",
+                "text": ""
+              }
+            ],
+            "classes": [
+              "tckList",
+              "clear"
+            ],
+            "tag": "li",
+            "text": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "children": [],
+                                        "classes": [
+                                          "blind"
+                                        ],
+                                        "tag": "span",
+                                        "text": "ITX-새마을"
+                                      }
+                                    ],
+                                    "classes": [
+                                      "train_itx_saemaeul_ticket"
+                                    ],
+                                    "tag": "span",
+                                    "text": ""
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "num"
+                                    ],
+                                    "tag": "span",
+                                    "text": "1423"
+                                  }
+                                ],
+                                "classes": [
+                                  "flag_wrap",
+                                  "type1"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [
+                              "tit_box",
+                              "type02"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          },
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "용산"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "정읍"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "( 13:24 ~ 16:50 )"
+                                  }
+                                ],
+                                "classes": [
+                                  "txt_bk"
+                                ],
+                                "tag": "h3",
+                                "text": "→"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "s_txt"
+                                ],
+                                "tag": "p",
+                                "text": "소요시간 : 3시간 26분"
+                              }
+                            ],
+                            "classes": [
+                              "data_box",
+                              "right"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "info_box"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "info_inner",
+                      "fl-l"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_ch"
+                                ],
+                                "tag": "p",
+                                "text": "일반실"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_price",
+                                  "txt_bk"
+                                ],
+                                "tag": "p",
+                                "text": "27,900원"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_gr"
+                                ],
+                                "tag": "p",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "gen"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": "-"
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "spe"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "tck_inner"
+                ],
+                "tag": "div",
+                "text": ""
+              }
+            ],
+            "classes": [
+              "tckList",
+              "clear"
+            ],
+            "tag": "li",
+            "text": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "children": [],
+                                        "classes": [
+                                          "blind"
+                                        ],
+                                        "tag": "span",
+                                        "text": "KTX-산천"
+                                      }
+                                    ],
+                                    "classes": [
+                                      "train_sancheon_ticket"
+                                    ],
+                                    "tag": "span",
+                                    "text": ""
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "num"
+                                    ],
+                                    "tag": "span",
+                                    "text": "423"
+                                  }
+                                ],
+                                "classes": [
+                                  "flag_wrap",
+                                  "type2"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [
+                              "tit_box",
+                              "type02"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          },
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "용산"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "정읍"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "( 14:08 ~ 15:52 )"
+                                  }
+                                ],
+                                "classes": [
+                                  "txt_bk"
+                                ],
+                                "tag": "h3",
+                                "text": "→"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "s_txt"
+                                ],
+                                "tag": "p",
+                                "text": "소요시간 : 1시간 44분"
+                              }
+                            ],
+                            "classes": [
+                              "data_box",
+                              "right"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "info_box"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "info_inner",
+                      "fl-l"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "tck_etc_use"
+                                    ],
+                                    "tag": "div",
+                                    "text": "입석 + 좌석"
+                                  }
+                                ],
+                                "classes": [
+                                  "tck_etc_small_text"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "yms"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "tck_etc_use"
+                                    ],
+                                    "tag": "div",
+                                    "text": "매진"
+                                  }
+                                ],
+                                "classes": [
+                                  "tck_etc_text"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "sold_out"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "tck_inner"
+                ],
+                "tag": "div",
+                "text": ""
+              }
+            ],
+            "classes": [
+              "tckList",
+              "clear"
+            ],
+            "tag": "li",
+            "text": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "children": [],
+                                        "classes": [
+                                          "blind"
+                                        ],
+                                        "tag": "span",
+                                        "text": "KTX-산천"
+                                      }
+                                    ],
+                                    "classes": [
+                                      "train_sancheon_ticket"
+                                    ],
+                                    "tag": "span",
+                                    "text": ""
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "num"
+                                    ],
+                                    "tag": "span",
+                                    "text": "457"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "p",
+                                    "text": "서대전정차"
+                                  }
+                                ],
+                                "classes": [
+                                  "flag_wrap",
+                                  "type2"
+                                ],
+                                "tag": "div",
+                                "text": ""
+                              }
+                            ],
+                            "classes": [
+                              "tit_box",
+                              "type02"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          },
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "용산"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "정읍"
+                                  },
+                                  {
+                                    "children": [],
+                                    "classes": [],
+                                    "tag": "span",
+                                    "text": "( 14:38 ~ 17:04 )"
+                                  }
+                                ],
+                                "classes": [
+                                  "txt_bk"
+                                ],
+                                "tag": "h3",
+                                "text": "→"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "s_txt"
+                                ],
+                                "tag": "p",
+                                "text": "소요시간 : 2시간 26분"
+                              }
+                            ],
+                            "classes": [
+                              "data_box",
+                              "right"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "info_box"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "info_inner",
+                      "fl-l"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_ch"
+                                ],
+                                "tag": "p",
+                                "text": "일반실"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_price",
+                                  "txt_bk"
+                                ],
+                                "tag": "p",
+                                "text": "34,100원"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_gr"
+                                ],
+                                "tag": "p",
+                                "text": "5%적립"
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "gen"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_ch"
+                                ],
+                                "tag": "p",
+                                "text": "특실(매진임박)"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_price",
+                                  "txt_bk"
+                                ],
+                                "tag": "p",
+                                "text": "49,700원"
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "txt_gr"
+                                ],
+                                "tag": "p",
+                                "text": "5%적립"
+                              }
+                            ],
+                            "classes": [],
+                            "tag": "a",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "inner",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "price_box",
+                      "fl-l",
+                      "spe",
+                      "sold_out_soon"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "tck_inner"
+                ],
+                "tag": "div",
+                "text": ""
+              }
+            ],
+            "classes": [
+              "tckList",
+              "clear"
+            ],
+            "tag": "li",
+            "text": ""
+          }
+        ],
+        "classes": [],
+        "tag": "ul",
+        "text": ""
+      }
+    ],
+    "classes": [
+      "tckWrap"
+    ],
+    "tag": "div",
+    "text": ""
+  },
+  "truncated": false
+}

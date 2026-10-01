@@ -47,7 +47,7 @@ export function readPublicSearch() {
   const rows = (list?.children || []).map(textOf).filter(Boolean).slice(0, 100);
   const timedRows = rows.filter(row => /\b\d{2}:\d{2}\b/.test(row));
   if ((list?.children.length || 0) > 100) truncated = true;
-  return {ok: true, schemaVersion: 1, capturedAt: new Date().toISOString(),
+  return {ok: true, schemaVersion: 1, capturedAt: new Date().toISOString(), documentEpoch: performance.timeOrigin,
     source: url.origin + url.pathname, conditions,
     status: text.includes('해당 스케줄에 운행하는 열차가 없습니다.') ? 'empty' :
       timedRows.length ? 'readable' : 'unrecognized',

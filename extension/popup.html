@@ -7,18 +7,27 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <header><span class="badge">읽기 전용 · 0.1</span><h1>열차 목록 확인</h1></header>
+  <header><span class="badge">목록 진단 · 0.2</span><h1>열차 목록 확인</h1></header>
   <p class="intro">코레일에서 직접 조회한 뒤 아래 버튼을 누르세요.</p>
   <button id="read" type="button">현재 목록 읽기</button>
   <p id="status" role="status" aria-live="polite">준비되었습니다.</p>
   <section id="result" hidden>
     <h2 id="route"></h2>
     <p id="date"></p>
+    <label for="target-times">관심 출발 시각 (쉼표로 구분)</label>
+    <input id="target-times" value="07:47, 08:20" autocomplete="off">
+    <p id="targets"></p>
     <ul id="rows"></ul>
+    <div class="probe">
+      <label for="timeout">갱신 후 목록 대기 (초)</label>
+      <input id="timeout" type="number" value="30" min="1" max="120">
+      <button id="refresh" type="button">갱신 1회 시험</button>
+      <small>현재 탭을 한 번 새로고침합니다. 확인 중에는 이 팝업을 열어 두세요.</small>
+    </div>
     <button id="save" type="button">진단 파일 저장</button>
     <details><summary>저장할 내용 확인</summary><pre id="preview"></pre></details>
   </section>
-  <footer>날짜·구간·화면에 표시된 공개 목록만 읽습니다.<br>자동 조회·예약·결제·외부 전송은 하지 않습니다.</footer>
+  <footer>현재 로드된 공개 목록만 분석합니다.<br>반복 조회·예약·결제·외부 전송은 하지 않습니다.</footer>
   <script type="module" src="popup.js"></script>
 </body>
 </html>

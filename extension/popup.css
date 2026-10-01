@@ -11,8 +11,15 @@ button:focus-visible, summary:focus-visible {outline: 3px solid #ebac27; outline
 #status {padding: 9px; background: #eaf0f5; border-radius: 6px; white-space: pre-wrap;}
 #date {margin-top: 3px; color: #52636e;}
 #rows {padding: 0; list-style: none; max-height: 260px; overflow: auto;}
-#rows li {background: white; border: 1px solid #d7e1e9; border-radius: 6px; padding: 9px; margin: 6px 0; overflow-wrap: anywhere;}
+#rows li {background: white; border: 1px solid #d7e1e9; border-radius: 6px; padding: 9px; margin: 6px 0; overflow-wrap: anywhere; white-space: pre-line;}
 details {margin: 14px 0;}
 summary {cursor: pointer;}
 pre {font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 180px; overflow: auto; background: white; padding: 8px;}
 footer {font-size: 11px; border-top: 1px solid #d7e1e9; padding-top: 13px; margin-top: 16px;}
+label {display: block; font-size: 12px; color: #52636e;}
+input {border: 1px solid #b8cbd6; border-radius: 5px; padding: 7px; font: inherit; width: 100%; margin: 3px 0;}
+#targets {white-space: pre-line; background: #e6f0f4; padding: 9px; border-radius: 6px;}
+.probe {border-top: 1px solid #d7e1e9; margin: 12px 0; padding-top: 10px;}
+.probe input {width: 75px; display: block; margin-bottom: 7px;}
+.probe small {display: block; color: #52636e; margin-top: 5px;}
+#refresh {background: #e1e9ef; color: #173b4b;}

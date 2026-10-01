@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "코레일 목록 확인",
-  "version": "0.1.0",
-  "description": "현재 코레일 조회 화면의 공개 열차 목록을 읽는 진단 도구입니다.",
+  "version": "0.2.0",
+  "description": "현재 코레일 공개 열차 목록을 분석하고 한 번의 새로고침을 시험합니다.",
   "permissions": ["activeTab", "scripting"],
   "action": {
     "default_title": "코레일 목록 확인",
