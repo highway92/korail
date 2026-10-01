@@ -19,3 +19,14 @@ def test_invalid_ui_values_are_rejected(field,value):
     values={k:'' if v is None else str(v) for k,v in asdict(TimingConfig()).items()}
     values[field]=value
     with pytest.raises(ValueError): parse_timings(values)
+
+
+def test_page_settle_delay_can_be_changed_or_disabled():
+    values={k:'' if v is None else str(v) for k,v in asdict(TimingConfig()).items()}
+    assert 'page_settle_delay' in values
+    for value in ('0','10','2.5'):
+        values['page_settle_delay']=value
+        assert parse_timings(values).page_settle_delay==float(value)
+    for value in ('-1','nan'):
+        values['page_settle_delay']=value
+        with pytest.raises(ValueError): parse_timings(values)

@@ -73,6 +73,8 @@ class Browser:
         self.diagnostics.clear()
         page.goto('https://www.korail.com/ticket/search/general', wait_until='domcontentloaded')
         page.get_by_role('button', name='열차 조회', exact=True).wait_for()
+        if config.timings.page_settle_delay:
+            page.wait_for_timeout(config.timings.page_settle_delay*1000)
         for dialog in page.get_by_role('dialog').all():
             close = dialog.get_by_role('button', name='창닫기', exact=True)
             if close.count() and close.is_visible():
@@ -84,6 +86,8 @@ class Browser:
                 page.get_by_placeholder('역명을 입력해주세요').fill(station)
                 self.click(page.get_by_role('button',name='검색',exact=True))
             self.click(station_link)
+            field_name='txtGoStart' if field=='출발역 선택' else 'txtGoEnd'
+            expect(page.locator(f'input[name="{field_name}"]')).to_have_value(station)
         expect(page.locator('input[name="txtGoStart"]')).to_have_value(config.departure)
         expect(page.locator('input[name="txtGoEnd"]')).to_have_value(config.arrival)
         self.click(page.get_by_role('link',name='출발일',exact=True))

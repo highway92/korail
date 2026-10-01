@@ -20,7 +20,8 @@ class TimingConfig:
     query_interval: float = 10
     navigation_timeout: float = 30
     element_timeout: float = 10
-    action_delay: float = 0
+    action_delay: float = 2
+    page_settle_delay: float = 10
     reservation_retry_delay: float = 10
     error_initial_delay: float = 20
     error_multiplier: float = 2
@@ -53,7 +54,7 @@ class TimingConfig:
                 continue
             else:
                 positive(value, name, 1 if name == "error_multiplier" else 0,
-                         name in ("action_delay", "error_multiplier"))
+                         name in ("action_delay", "page_settle_delay", "error_multiplier"))
         if self.error_max_delay < self.error_initial_delay:
             raise ValueError("오류 대기 상한은 첫 대기 이상이어야 합니다")
 

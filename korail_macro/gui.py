@@ -16,6 +16,7 @@ TIMING_LABELS = {
     'navigation_timeout':'페이지 이동 제한 (초)',
     'element_timeout':'화면 요소 대기 제한 (초)',
     'action_delay':'클릭 후 추가 대기 (초)',
+    'page_settle_delay':'조회 화면 진입 후 대기 (초)',
     'reservation_retry_delay':'좌석 선점 실패 후 대기 (초)',
     'error_initial_delay':'첫 조회 오류 후 대기 (초)',
     'error_multiplier':'조회 오류 대기 배수',
@@ -165,8 +166,8 @@ class App:
         for row,(name,label) in enumerate(TIMING_LABELS.items()):
             ttk.Label(frame,text=label).grid(row=row,column=0,sticky='w',pady=3)
             ttk.Entry(frame,textvariable=self.timings[name],width=29).grid(row=row,column=1,padx=10,pady=3)
-        ttk.Label(frame,text='종료 시각 예: 2026-10-09T07:30:00+09:00\n조회 간격은 직전 조회 완료 후부터 계산합니다.').grid(row=16,column=0,columnspan=2,sticky='w',pady=8)
-        ttk.Button(frame,text='닫기',command=win.destroy).grid(row=17,column=1,sticky='e')
+        ttk.Label(frame,text='종료 시각 예: 2026-10-09T07:30:00+09:00\n조회 간격은 직전 조회 완료 후부터 계산합니다.').grid(row=len(TIMING_LABELS),column=0,columnspan=2,sticky='w',pady=8)
+        ttk.Button(frame,text='닫기',command=win.destroy).grid(row=len(TIMING_LABELS)+1,column=1,sticky='e')
 
     def send(self,command):
         if self.closing: return
