@@ -175,3 +175,15 @@ def test_payment_request_timeout_does_not_retry(tmp_path):
     e.start(); until(e,'uncertain')
     for _ in range(4): c[0]+=20; e.tick()
     assert s.requests==1 and e.store.load()['payment_requested_at'] is not None
+
+
+def test_http_failure_uses_backoff_and_explains_empty_list(tmp_path):
+    from korail_macro.diagnostics import SearchRequestError
+    e,s,c,_=setup_engine(tmp_path)
+    events=[]; e.emit=events.append
+    def fail(cfg): raise SearchRequestError('조회 중 HTTP 500 응답')
+    s.search=fail
+    e.start(); e.tick()
+    assert e.next_at==c[0]+e.config.timings.error_initial_delay
+    assert 'HTTP 500' in events[-1]['message']
+    assert e.state=='scanning' and s.reserves==0

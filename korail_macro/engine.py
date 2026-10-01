@@ -8,6 +8,7 @@ from uuid import uuid4
 from .config import KST
 from .selection import choose_candidate
 from .site import Reservation, ReservationRejected, NeedsInspection
+from .diagnostics import SearchRequestError
 
 
 class Engine:
@@ -145,12 +146,13 @@ class Engine:
                 trains=self.site.search(self.config)
             except NeedsInspection as exc:
                 self._resume='scanning'; self.state='paused'; self.notify(str(exc)); return
-            except Exception:
+            except Exception as exc:
                 self.errors+=1; self.last_query=self.clock()
                 if self.errors>=t.max_consecutive_errors:
                     self._resume='scanning'; self.state='paused'
                 self.next_at=self.last_query+t.error_delay(self.errors)
-                self.notify(f'조회 오류 {self.errors}회'); return
+                detail=f': {exc}' if isinstance(exc,SearchRequestError) else ''
+                self.notify(f'조회 오류 {self.errors}회{detail}'); return
             self.errors=0; self.last_query=self.clock(); self.next_at=self.last_query+t.query_interval
             self.notify('열차 목록 확인', trains=trains)
             trains=[v for v in trains if datetime.fromisoformat(f'{v.key.date}T{v.key.time}').replace(tzinfo=KST).timestamp()>self.clock()]

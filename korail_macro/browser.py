@@ -2,10 +2,12 @@
 from datetime import date
 from pathlib import Path
 import re
+from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright, expect
 
 from .site import NeedsInspection
+from .diagnostics import SearchDiagnostics
 
 
 class Browser:
@@ -14,11 +16,20 @@ class Browser:
     def __init__(self, profile):
         self.profile = Path(profile)
         self.playwright = self.context = self.page = None
+        self.diagnostics = SearchDiagnostics()
+
+    def observe_page(self):
+        page=self.page
+        page.on('request',lambda request:self.diagnostics.begin_request(page.url,request))
+        page.on('response',lambda response:self.diagnostics.response(page.url,response))
+        page.on('requestfailed',lambda request:self.diagnostics.failed(page.url,request))
+        page.on('pageerror',lambda error:self.diagnostics.page_error(page.url))
 
     def open(self):
         if self.context is not None:
             if self.page.is_closed():
                 self.page = self.context.new_page()
+                self.observe_page()
                 self.page.goto('https://www.korail.com/ticket/search/general')
             return
         self.profile.mkdir(parents=True, exist_ok=True)
@@ -28,6 +39,7 @@ class Browser:
                 str(self.profile), channel='chrome', headless=False,
                 viewport={'width':1400,'height':1000})
             self.page = self.context.pages[0] if self.context.pages else self.context.new_page()
+            self.observe_page()
             self.page.goto('https://www.korail.com/ticket/search/general', wait_until='domcontentloaded')
         except Exception:
             self.close()
@@ -58,6 +70,7 @@ class Browser:
         config.validate(require_targets=False)
         self.apply_timings(config.timings)
         page = self.page
+        self.diagnostics.clear()
         page.goto('https://www.korail.com/ticket/search/general', wait_until='domcontentloaded')
         page.get_by_role('button', name='열차 조회', exact=True).wait_for()
         for dialog in page.get_by_role('dialog').all():
@@ -84,7 +97,11 @@ class Browser:
         expect(page.locator('.info_day')).to_contain_text(f'{d.day:02d}일')
         self.click(page.get_by_role('button',name='적용',exact=True))
         expect(page.locator('#startDate')).to_have_value(re.compile(re.escape(config.travel_date)))
-        self.click(page.get_by_role('button',name='열차 조회',exact=True))
+        # The empty-result container renders before the search response arrives.
+        with page.expect_response(lambda r: self.diagnostics.search_request(r.url,r.request.resource_type)
+                                  and urlsplit(r.url).path.startswith('/web_s/'),
+                                  timeout=config.timings.navigation_timeout*1000):
+            self.click(page.get_by_role('button',name='열차 조회',exact=True))
         page.wait_for_url('**/ticket/search/list')
         return self.read_trains(config)
 
@@ -98,6 +115,7 @@ class Browser:
         expect(page.locator('#labelend')).to_have_value(config.arrival)
         expect(page.locator('#startDate')).to_have_value(re.compile(re.escape(config.travel_date)))
         page.locator('.tckWrap > ul').wait_for()
+        self.diagnostics.check()
         # Only the public train result container; no login or payment page capture.
         (self.profile.parent/'search-rows.html').write_text(page.locator('.tckWrap').inner_html(),encoding='utf-8')
         if page.get_by_text('해당 스케줄에 운행하는 열차가 없습니다.',exact=True).is_visible():

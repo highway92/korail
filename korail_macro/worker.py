@@ -60,7 +60,8 @@ class Worker(Thread):
     @staticmethod
     def safe_error(exc):
         from .site import NeedsInspection
-        if isinstance(exc, NeedsInspection):
+        from .diagnostics import SearchRequestError
+        if isinstance(exc, (NeedsInspection,SearchRequestError)):
             return str(exc)
         return f'{type(exc).__name__}: 작업을 완료하지 못했습니다. 브라우저 상태를 확인하세요.'
 

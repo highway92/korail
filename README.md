@@ -42,6 +42,8 @@ py -3.12 -m venv .venv
 
 ## 검증
 
+조회 중 HTTP 500 등의 실패를 확인하면 빈 목록을 운행 없음이나 매진으로 처리하지 않고 오류로 표시합니다. 실행 중인 구버전 창에는 변경이 즉시 반영되지 않으므로 다음 실행부터 적용됩니다. 현재 실사이트 조회 실패 원인은 조사 중입니다.
+
 ```powershell
 & .venv/Scripts/python.exe -m pytest -q
 & .venv/Scripts/python.exe -m tools.smoke_gui
