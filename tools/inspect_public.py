@@ -17,13 +17,21 @@ args.add_argument('--sandbox', action='store_true')
 args.add_argument('--action-delay', type=float, default=0)
 args.add_argument('--initial-delay', type=float, default=0)
 args.add_argument('--from-home', action='store_true')
+args.add_argument('--cdp-endpoint', help='Local probe Chrome endpoint')
 args = args.parse_args()
 year, month, day = map(int, args.date.split('-'))
 out = Path('.artifacts')
 out.mkdir(exist_ok=True)
 with sync_playwright() as p:
-    browser = p.chromium.launch(channel='chrome', headless=not args.visible,chromium_sandbox=args.sandbox)
-    page = browser.new_page(viewport={'width': 1400, 'height': 1000})
+    if args.cdp_endpoint:
+        target=urlsplit(args.cdp_endpoint)
+        if target.scheme!='http' or target.hostname!='127.0.0.1' or not target.port:
+            raise ValueError('CDP probe must use a nonzero loopback port')
+        browser=p.chromium.connect_over_cdp(args.cdp_endpoint,no_defaults=True)
+        page=browser.contexts[0].pages[0]
+    else:
+        browser = p.chromium.launch(channel='chrome', headless=not args.visible,chromium_sandbox=args.sandbox)
+        page = browser.new_page(viewport={'width': 1400, 'height': 1000})
     def click(locator):
         locator.click()
         if args.action_delay:
