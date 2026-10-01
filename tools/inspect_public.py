@@ -3,6 +3,8 @@ from pathlib import Path
 import argparse
 import json
 import re
+import time
+from html import unescape
 from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright, expect
 
@@ -14,6 +16,7 @@ args.add_argument('--visible', action='store_true')
 args.add_argument('--sandbox', action='store_true')
 args.add_argument('--action-delay', type=float, default=0)
 args.add_argument('--initial-delay', type=float, default=0)
+args.add_argument('--from-home', action='store_true')
 args = args.parse_args()
 year, month, day = map(int, args.date.split('-'))
 out = Path('.artifacts')
@@ -26,6 +29,10 @@ with sync_playwright() as p:
         if args.action_delay:
             page.wait_for_timeout(args.action_delay*1000)
     diagnostic = []
+    started=time.monotonic()
+    def clean(text):
+        text=re.sub(r'https?://[^\s<>"\']+',lambda m:endpoint(m.group()),text)
+        return re.sub(r'[A-Za-z0-9_+/=-]{32,}','[redacted]',text)[:300]
     def endpoint(url):
         parsed=urlsplit(url)
         path=parsed.path
@@ -34,15 +41,36 @@ with sync_playwright() as p:
         return parsed.scheme+'://'+parsed.netloc+path
     def response_seen(response):
         if response.request.resource_type in ('xhr','fetch') or response.status>=400:
-            diagnostic.append({'event':'response','url':endpoint(response.url),
+            item={'event':'response','url':endpoint(response.url),
                                'status':response.status,'type':response.request.resource_type,
-                               'content_type':response.headers.get('content-type','')})
+                               'content_type':response.headers.get('content-type','')}
+            if response.status>=400 and urlsplit(response.url).netloc=='www.korail.com':
+                try:
+                    body=response.text()
+                    title=re.search(r'<title[^>]*>(.*?)</title>',body,re.I|re.S)
+                    item['error_title']=clean(unescape(title.group(1))) if title else None
+                    visible=re.sub(r'<(script|style)\b[^>]*>.*?</\1>','',body,flags=re.I|re.S)
+                    visible=re.sub(r'<[^>]+>',' ',visible)
+                    item['error_text']=clean(re.sub(r'\s+',' ',unescape(visible)).strip())
+                    item['error_markers']=[term for term in ('Internal Server Error','Access Denied','Forbidden','자동화','매크로','차단','비정상','보안','오류') if term.lower() in body.lower()]
+                    item['body_length']=len(body)
+                except Exception:
+                    item['error_body_unavailable']=True
+            diagnostic.append(item)
     def failed(request):
         diagnostic.append({'event':'requestfailed','url':endpoint(request.url),
                            'error':request.failure,'type':request.resource_type})
     page.on('response',response_seen)
     page.on('requestfailed',failed)
-    page.on('pageerror',lambda error:diagnostic.append({'event':'pageerror','name':error.name}))
+    def page_error(error):
+        sources=re.findall(r'https?://[^\s)]+',error.stack or '')
+        diagnostic.append({'event':'pageerror','name':error.name,'message':clean(error.message),
+                           'sources':list(dict.fromkeys(endpoint(url) for url in sources)),
+                           'elapsed_seconds':round(time.monotonic()-started,2)})
+    page.on('pageerror',page_error)
+    if args.from_home:
+        page.goto('https://www.korail.com/ticket/main',wait_until='load')
+        page.wait_for_timeout(args.initial_delay*1000)
     page.goto('https://www.korail.com/ticket/search/general', wait_until='domcontentloaded')
     page.get_by_role('button', name='열차 조회', exact=True).wait_for()
     if args.initial_delay:
