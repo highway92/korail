@@ -28,14 +28,19 @@ function seat(cell,index) {
     const prices=[...nodes(cell)].filter(n=>has(n,'txt_price'));
     if (labels.length===1 && prices.length===1 &&
         new RegExp('^'+seatClass+'(?:\\([^)]*\\))?$').test(text(labels[0]))) {
-      const amount=text(prices[0]);
+      let amount=text(prices[0]);
+      // Discount cards put the percentage in txt_price and the fare in txt_gr.
+      if (/^(?:운임)?\d{1,2}% 할인$/.test(amount)) {
+        const fares=[...nodes(cell)].filter(n=>has(n,'txt_gr') && /^(?:\d{1,3}(?:,\d{3})*|\d+)원$/.test(text(n)));
+        amount=fares.length===1?text(fares[0]):'';
+      }
       if (/^(?:\d{1,3}(?:,\d{3})*|\d+)원$/.test(amount)) {
         price=Number(amount.replace(/[,원]/g,''));
         if (price>0) status='available';
       }
     }
   }
-  return {seatClass,status,price,label};
+  return {seatClass,status,price,label,selected:has(cell,'active')};
 }
 export function parseSnapshot(snapshot) {
   if (!snapshot?.ok || snapshot.schemaVersion!==1 || snapshot.truncated ||

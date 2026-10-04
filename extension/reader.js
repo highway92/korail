@@ -47,9 +47,19 @@ export function readPublicSearch() {
   const rows = (list?.children || []).map(textOf).filter(Boolean).slice(0, 100);
   const timedRows = rows.filter(row => /\b\d{2}:\d{2}\b/.test(row));
   if ((list?.children.length || 0) > 100) truncated = true;
+  // Only these public action labels are collected outside the train list.
+  // Do not capture surrounding account text, form values, links, or handlers.
+  const actionLabels=new Set(['예매','좌석선택','운임요금','열차시각']);
+  const actions=[...document.querySelectorAll('button,a,[role="button"]')].filter(el=>{
+    if (!actionLabels.has(compact(el.textContent || ''))) return false;
+    for(let parent=el;parent;parent=parent.parentElement) if(!rendered(parent)) return false;
+    return true;
+  }).slice(0,20).map(el=>({tag:el.tagName.toLowerCase(),text:compact(el.textContent || ''),
+    classes:[...el.classList].filter(c=>/^[a-zA-Z_][a-zA-Z0-9_-]{0,48}$/.test(c)).slice(0,12),
+    disabled:el.matches(':disabled') || el.getAttribute('aria-disabled')==='true'}));
   return {ok: true, schemaVersion: 1, capturedAt: new Date().toISOString(), documentEpoch: performance.timeOrigin,
     source: url.origin + url.pathname, conditions,
     status: text.includes('해당 스케줄에 운행하는 열차가 없습니다.') ? 'empty' :
       timedRows.length ? 'readable' : 'unrecognized',
-    rows: timedRows, publicText: text, structure: tree, truncated};
+    rows: timedRows, publicText: text, structure: tree, actions, truncated};
 }

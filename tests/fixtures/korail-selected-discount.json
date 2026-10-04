@@ -1,0 +1,258 @@
+{
+  "ok": true,
+  "schemaVersion": 1,
+  "source": "https://www.korail.com/ticket/search/list",
+  "conditions": {
+    "arrival": "정읍",
+    "date": "2026-10-07(수) 00:00",
+    "departure": "용산",
+    "passengers": "총 1명"
+  },
+  "status": "readable",
+  "truncated": false,
+  "structure": {
+    "tag": "div",
+    "classes": [
+      "tckWrap"
+    ],
+    "text": "",
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [
+                                  {
+                                    "children": [],
+                                    "classes": [
+                                      "blind"
+                                    ],
+                                    "tag": "span",
+                                    "text": "KTX-산천"
+                                  }
+                                ],
+                                "classes": [
+                                  "train_sancheon_ticket"
+                                ],
+                                "tag": "span",
+                                "text": ""
+                              },
+                              {
+                                "children": [],
+                                "classes": [
+                                  "num"
+                                ],
+                                "tag": "span",
+                                "text": "403"
+                              }
+                            ],
+                            "classes": [
+                              "flag_wrap",
+                              "type2"
+                            ],
+                            "tag": "div",
+                            "text": ""
+                          }
+                        ],
+                        "classes": [
+                          "tit_box",
+                          "type02"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      },
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "children": [],
+                                "classes": [],
+                                "tag": "span",
+                                "text": "용산"
+                              },
+                              {
+                                "children": [],
+                                "classes": [],
+                                "tag": "span",
+                                "text": "정읍"
+                              },
+                              {
+                                "children": [],
+                                "classes": [],
+                                "tag": "span",
+                                "text": "( 05:48 ~ 07:27 )"
+                              }
+                            ],
+                            "classes": [
+                              "txt_bk"
+                            ],
+                            "tag": "h3",
+                            "text": "→"
+                          },
+                          {
+                            "children": [],
+                            "classes": [
+                              "s_txt"
+                            ],
+                            "tag": "p",
+                            "text": "소요시간 : 1시간 39분"
+                          }
+                        ],
+                        "classes": [
+                          "data_box",
+                          "right"
+                        ],
+                        "tag": "div",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "info_box"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "info_inner",
+                  "fl-l"
+                ],
+                "tag": "div",
+                "text": ""
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [],
+                            "classes": [
+                              "txt_ch"
+                            ],
+                            "tag": "p",
+                            "text": "일반실"
+                          },
+                          {
+                            "children": [],
+                            "classes": [
+                              "txt_price",
+                              "txt_bk"
+                            ],
+                            "tag": "p",
+                            "text": "15% 할인"
+                          },
+                          {
+                            "children": [],
+                            "classes": [
+                              "txt_gr"
+                            ],
+                            "tag": "p",
+                            "text": "29,700원"
+                          }
+                        ],
+                        "classes": [],
+                        "tag": "a",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "inner",
+                      "type02"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "price_box",
+                  "fl-l",
+                  "active",
+                  "gen"
+                ],
+                "tag": "div",
+                "text": ""
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [],
+                            "classes": [
+                              "txt_ch"
+                            ],
+                            "tag": "p",
+                            "text": "특실(매진임박)"
+                          },
+                          {
+                            "children": [],
+                            "classes": [
+                              "txt_price",
+                              "txt_bk"
+                            ],
+                            "tag": "p",
+                            "text": "운임15% 할인"
+                          },
+                          {
+                            "children": [],
+                            "classes": [
+                              "txt_gr"
+                            ],
+                            "tag": "p",
+                            "text": "45,500원"
+                          }
+                        ],
+                        "classes": [],
+                        "tag": "a",
+                        "text": ""
+                      }
+                    ],
+                    "classes": [
+                      "inner",
+                      "type02"
+                    ],
+                    "tag": "div",
+                    "text": ""
+                  }
+                ],
+                "classes": [
+                  "price_box",
+                  "fl-l",
+                  "spe",
+                  "sold_out_soon"
+                ],
+                "tag": "div",
+                "text": ""
+              }
+            ],
+            "classes": [
+              "tck_inner"
+            ],
+            "tag": "div",
+            "text": ""
+          }
+        ],
+        "classes": [
+          "tckList",
+          "clear"
+        ],
+        "tag": "li",
+        "text": ""
+      }
+    ]
+  }
+}

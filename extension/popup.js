@@ -1,6 +1,7 @@
 import {readPublicSearch} from './reader.js';
 import {parseSnapshot, summarizeTargets} from './parser.js';
 import {probeRefresh} from './refresh.js';
+import {limitedReload} from './rate-limit.js';
 
 const $=id=>document.getElementById(id);
 let report=null, tabId=null;
@@ -8,7 +9,14 @@ const errors={wrong_page:'코레일의 열차 조회 결과 탭에서 실행해 
   missing_list:'조회 목록 영역을 찾지 못했습니다. 목록이 표시된 뒤 다시 눌러 주세요.',
   missing_conditions:'날짜·출발역·도착역을 읽지 못했습니다. 조회 화면인지 확인해 주세요.'};
 const statuses={sold_out:'매진',unavailable:'미운영',waitlist:'예약대기',standing_combo:'입석 포함',unknown:'확인 필요',available:'좌석 표시'};
-function busy(value) {for(const id of ['read','refresh','save','target-times','timeout']) $(id).disabled=value;}
+function busy(value) {for(const id of ['read','refresh','save','target-times','timeout','monitor']) $(id).disabled=value;}
+$('monitor').addEventListener('click',async()=>{
+  try {
+    const [tab]=await chrome.tabs.query({active:true,currentWindow:true});
+    if(!tab?.id) throw new Error('no_tab');
+    await chrome.windows.create({url:chrome.runtime.getURL(`monitor.html?tab=${tab.id}`),type:'popup',width:650,height:850});
+  } catch {$('status').textContent='설정창을 열지 못했습니다. 코레일 목록 탭에서 다시 실행해 주세요.';}
+});
 async function readTab(id) {
   const result=await chrome.scripting.executeScript({target:{tabId:id},world:'ISOLATED',func:readPublicSearch});
   return result[0]?.result;
@@ -31,7 +39,7 @@ function render(data) {
   $('date').textContent=`${data.conditions.date} · ${data.conditions.passengers}`;
   $('rows').replaceChildren();
   const lines=parsed?parsed.trains.map(t=>`${t.key.time} → ${t.arrivalTime} · ${t.type} ${t.key.number}\n`+
-    t.seats.map(s=>`${s.seatClass} ${statuses[s.status]}${s.price?' '+s.price.toLocaleString('ko-KR')+'원':''}`).join(' / ')):data.rows;
+    t.seats.map(s=>`${s.seatClass} ${statuses[s.status]}${s.selected?' [선택됨]':''}${s.price?' '+s.price.toLocaleString('ko-KR')+'원':''}`).join(' / ')):data.rows;
   for(const line of lines) {const li=document.createElement('li');li.textContent=line;$('rows').append(li);}
   const descriptions={readable:parsed?`열차 ${parsed.trains.length}편을 구분했습니다.`:`목록 항목 ${data.rows.length}개를 읽었습니다. 행 구조 확인이 필요합니다.`,
     empty:'사이트가 빈 목록을 표시합니다. 매진 여부는 판단할 수 없습니다.',
@@ -65,7 +73,7 @@ $('refresh').addEventListener('click',async()=>{
     if(!baseline?.ok) throw new Error('page_changed');
     $('status').textContent='탭을 한 번 새로고침한 뒤 목록을 기다립니다…';
     const result=await probeRefresh({baseline,timeoutMs:seconds*1000,
-      reload:()=>chrome.tabs.reload(tabId),read:()=>readTab(tabId),sleep:ms=>new Promise(resolve=>setTimeout(resolve,ms))});
+      reload:()=>limitedReload({reload:()=>chrome.tabs.reload(tabId),deadline:Date.now()+seconds*1000}),read:()=>readTab(tabId),sleep:ms=>new Promise(resolve=>setTimeout(resolve,ms))});
     if(result.snapshot) render(result.snapshot);
     const code=result.ok?'success':result.code;
     report={...report,refreshProbe:{status:code,timeoutSeconds:seconds,at:new Date().toISOString()}};

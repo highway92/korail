@@ -1,0 +1,17 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>코레일 매크로 · 카드 관리</title>
+<link rel="stylesheet" href="popup.css"><style>body{width:auto;max-width:580px;margin:auto}.buttons{display:flex;gap:8px;margin-top:12px}</style></head>
+<body><span class="badge">카드 관리 · 0.8</span><h1>결제 카드 관리</h1>
+<p id="summary"></p><p>이 Chrome 프로필에만 암호화 없이 저장합니다. 해당 프로필에 접근할 수 있는 사람은 카드정보도 확인할 수 있습니다.</p>
+<p>개인정보 수집·이용동의와 코레일 앱 발권은 매크로에서 항상 체크합니다.</p>
+<form id="card-form" autocomplete="off">
+<label>카드번호 16자리<input id="number" type="password" inputmode="numeric" maxlength="16" required autocomplete="off"></label>
+<label>유효기간 월<input id="month" inputmode="numeric" maxlength="2" required autocomplete="off"></label>
+<label>유효기간 연도 4자리<input id="year" inputmode="numeric" maxlength="4" required autocomplete="off"></label>
+<label>인증번호 (주민번호 앞 6자리)<input id="birth" type="password" inputmode="numeric" maxlength="6" required autocomplete="off"></label>
+<label>카드 비밀번호 앞 2자리<input id="pin" type="password" inputmode="numeric" maxlength="2" required autocomplete="off"></label>
+<div class="buttons"><button type="submit">저장</button><button type="button" id="edit">저장 카드 수정</button><button type="button" id="delete">삭제</button></div>
+</form><p id="status" role="status"></p>
+<details id="legacy"><summary>기존 암호화 카드 가져오기 (한 번만)</summary>
+<label>기존 보관함 비밀번호<input id="legacy-password" type="password" autocomplete="off"></label>
+<button id="import" type="button">로컬 카드로 가져오기</button><small>성공하면 기존 암호문은 삭제하고 이후 잠금 해제 없이 사용합니다.</small></details>
+<script type="module" src="cards.js"></script></body></html>

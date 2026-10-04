@@ -3,6 +3,20 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {parseSnapshot, summarizeTargets} from '../extension/parser.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('./fixtures/korail-public-rows.json',import.meta.url),'utf8'));
+const discountFixture=()=>JSON.parse(readFileSync(new URL('./fixtures/korail-selected-discount.json',import.meta.url),'utf8'));
+test('selected discount fare uses amount, not percentage, and preserves selected class',()=>{
+  const train=parseSnapshot(discountFixture()).trains[0];
+  assert.equal(train.key.number,'403');
+  assert.deepEqual(train.availableClasses,['일반실','특실']);
+  assert.equal(train.seats[0].price,29700);assert.equal(train.seats[1].price,45500);
+  assert.equal(train.seats[0].selected,true);assert.equal(train.seats[1].selected,false);
+});
+test('discount without unambiguous fare remains unknown',()=>{
+  const data=discountFixture();
+  function visit(n){if(n.classes.includes('txt_gr'))n.text='5%적립';n.children.forEach(visit);}
+  visit(data.structure);
+  assert.deepEqual(parseSnapshot(data).trains[0].availableClasses,[]);
+});
 
 test('real rows identify trains, full-seat availability and mixed standing seats',()=>{
   const {trains}=parseSnapshot(fixture());

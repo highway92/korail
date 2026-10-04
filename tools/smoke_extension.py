@@ -17,7 +17,8 @@ fixture='''<!doctype html><meta charset="utf-8">
 <li class="sample"><span>KTX 산천 409</span><span>용산 → 정읍(07:47 ~ 09:23)</span><button data-token="TOKEN_SECRET">매진</button></li>
 <li class="sample"><span>KTX 산천 411</span><span>용산 → 정읍(08:20 ~ 09:50)</span><span>매진</span>
 <div hidden>HIDDEN_SECRET</div><div style="opacity:0">INVISIBLE_SECRET</div><input type="hidden" value="FORM_SECRET"></li>
-</ul></div>'''
+</ul></div><button class="reserve" data-token="ACTION_SECRET">예매</button>
+<div hidden><button>예매</button></div><button>ACCOUNT_SECRET</button>'''
 with sync_playwright() as p:
     browser=p.chromium.launch(channel='chrome',headless=True)
     page=browser.new_page()
@@ -29,6 +30,7 @@ with sync_playwright() as p:
     assert report['conditions']['departure']=='용산'
     assert report['source']=='https://www.korail.com/ticket/search/list'
     assert 'SECRET' not in json.dumps(report)
+    assert report['actions']==[{'tag':'button','text':'예매','classes':['reserve'],'disabled':False}]
     assert page.content()==before
     page.goto('https://www.korail.com/ticket/reservation/detail')
     assert page.evaluate(read)=={'ok':False,'code':'wrong_page'}
@@ -40,7 +42,7 @@ with sync_playwright() as p:
 
     popup=browser.new_page(viewport={'width':420,'height':760},accept_downloads=True)
     def asset(route):
-        name=route.request.url.rsplit('/',1)[-1]
+        name=route.request.url.split('?',1)[0].rsplit('/',1)[-1]
         path=folder/name
         if path.parent!=folder or not path.is_file():
             route.fulfill(status=404,body=''); return
@@ -67,5 +69,78 @@ with sync_playwright() as p:
     assert popup.evaluate('window.probeReloads')==1
     Path('.artifacts').mkdir(exist_ok=True)
     popup.screenshot(path='.artifacts/extension-popup.png',full_page=True)
+    # Dashboard uses the saved target tab, not whichever tab is currently active.
+    dashboard_context=browser.new_context(viewport={'width':650,'height':1000})
+    dashboard=dashboard_context.new_page()
+    dashboard.route('**/*',asset)
+    dashboard.add_init_script('window.data='+json.dumps(actual,ensure_ascii=False)+';window.reloads=0;window.chrome={scripting:{executeScript:async()=>[{result:structuredClone(window.data)}]},tabs:{reload:async()=>{window.reloads++;window.data.documentEpoch++;}}};')
+    dashboard.goto('https://extension.test/monitor.html?tab=1')
+    dashboard.get_by_role('button',name='현재 목록 불러오기').click()
+    expect(dashboard.locator('#trains input')).to_have_count(4)
+    expect(dashboard.locator('#general')).to_be_checked()
+    expect(dashboard.locator('#special')).to_be_checked()
+    cards=dashboard.context.new_page()
+    cards.route('**/*',asset)
+    cards.goto('https://extension.test/cards.html')
+    for key,value in {'number':'0000000000000000','month':'06','year':'2099','birth':'000101','pin':'00'}.items():
+        cards.locator('#'+key).fill(value)
+    cards.get_by_role('button',name='저장',exact=True).click()
+    expect(cards.locator('#status')).to_contain_text('저장했습니다')
+    expect(dashboard.locator('#saved-card')).to_contain_text('0000')
+    cards.reload()
+    expect(cards.locator('#summary')).to_contain_text('0000')
+    cards.get_by_role('button',name='저장 카드 수정').click()
+    expect(cards.locator('#number')).to_have_value('0000000000000000')
+    cards.screenshot(path='.artifacts/card-management.png',full_page=True)
+    dashboard.locator('#interval').fill('1')
+    dashboard.locator('#maxQueries').fill('1')
+    dashboard.get_by_role('button',name='반복 조회 시작').click()
+    expect(dashboard.locator('#status')).to_contain_text('조회 횟수',timeout=7000)
+    assert dashboard.evaluate('window.reloads')==1
+    dashboard.locator('#trains input').nth(1).uncheck()
+    dashboard.locator('#interval').fill('30')
+    dashboard.get_by_role('button',name='반복 조회 시작').click()
+    expect(dashboard.locator('#status')).to_contain_text('다음 조회 대기')
+    dashboard.get_by_role('button',name='중지',exact=True).click()
+    expect(dashboard.locator('#status')).to_contain_text('중지했습니다')
+    assert dashboard.evaluate('window.reloads')==1
+    dashboard.screenshot(path='.artifacts/extension-monitor.png',full_page=True)
+    # One start executes the entire mocked transaction; card inputs are not requested again.
+    dashboard.evaluate('''()=>{
+      localStorage.setItem('korail-transaction-v1','{old_broken_record');window.reserveAttempts=0;window.trainConfirms=0;window.notice=null;window.flowPage='search';window.payments=0;window.fills=0;
+      chrome.scripting.executeScript=async({func,args})=>{
+        if(func.name==='readPublicSearch')return [{result:structuredClone(window.data)}];
+        if(func.name==='searchAction'){
+          if(args[0].mode==='reserve'){window.reserveAttempts++;if(window.reserveAttempts===1)return [{result:{ok:false,code:'covered_action'}}];if(window.reserveAttempts<=3)window.notice='train';else window.flowPage='reservation';}return [{result:{ok:true}}];
+        }
+        if(func.name==='checkoutPage'){
+          const mode=args[0].mode;
+          if(mode==='dismiss'){window.notice=null;window.trainConfirms++;if(window.trainConfirms===2)window.flowPage='reservation';}
+          if(mode==='inspect'&&window.notice)return [{result:{ok:true,page:window.flowPage,notice:window.notice}}];
+          if(mode==='openPayment')window.flowPage='payment';
+          if(mode==='submitPayment'){window.flowPage='tickets';window.payments++;}
+          return [{result:{ok:true,page:window.flowPage,match:true,reservation:{coach:'14',seat:'2A',deadline:Date.now()+600000}}}];
+        }
+        if(func.name==='fillPersonalCard'){
+          if(args[0].number!=='0000000000000000')throw Error('missing_card');
+          window.fills++;return [{result:{ok:true}}];
+        }
+        throw Error('unexpected_function');
+      };
+    }''')
+    dashboard.locator('#trains input').nth(1).check()
+    dashboard.locator('#action-delay').fill('0')
+    assert dashboard.locator('#auto-payment, #auto-reserve, #archive-transaction').count()==0
+    dashboard.get_by_role('button',name='반복 조회 시작').click()
+    expect(dashboard.locator('#status')).to_contain_text('실행을 완료했습니다',timeout=7000)
+    assert dashboard.evaluate('window.payments')==1
+    assert dashboard.evaluate('window.reserveAttempts')==3
+    assert dashboard.evaluate('window.trainConfirms')==2
+    assert dashboard.evaluate('window.fills')==2
+    assert '0000000000000000' not in dashboard.evaluate('localStorage.getItem("korail-transaction-v1")')
+    assert dashboard.locator('#card-agree').count()==0
+    assert dashboard.locator('#card-app').count()==0
+    cards.get_by_role('button',name='삭제',exact=True).click()
+    expect(dashboard.locator('#saved-card')).to_contain_text('저장된 카드 없음')
     browser.close()
 print('Offline extension checks OK: scope, public rows, no secrets, empty/unknown states, popup, JSON download')
