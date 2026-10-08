@@ -1,5 +1,5 @@
 // Serialized into the granted Korail tab. Validate identity and availability again at click time.
-export function searchAction({mode,key,seatClass}) {
+export function searchAction({mode,key,seatClass,native=false}) {
   const fail=code=>({ok:false,code});
   const covered=el=>({ok:false,code:'covered_action',blocker:el?{tag:el.tagName.toLowerCase(),classes:[...el.classList].filter(s=>/^[a-zA-Z_][a-zA-Z0-9_-]{0,60}$/.test(s)).slice(0,8)}:null});
   const text=el=>(el?.textContent||'').replace(/\s+/g,' ').trim();
@@ -7,6 +7,23 @@ export function searchAction({mode,key,seatClass}) {
     if(!el || !el.getClientRects().length)return false;
     for(let p=el;p;p=p.parentElement){const s=getComputedStyle(p);if(s.display==='none'||s.visibility==='hidden'||s.visibility==='collapse'||Number(s.opacity)===0)return false;}
     return true;
+  };
+  // Public DOM input sequence. Synthetic events remain untrusted; no trust spoofing.
+  const press=el=>{
+    if(native){window.__korailNativeTarget={element:el,path:location.pathname};return {ok:true,native:true};}
+    const r=el.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;
+    const base={bubbles:true,cancelable:true,composed:true,clientX:x,clientY:y,button:0,view:window};
+    const pointer={...base,pointerId:1,pointerType:'mouse',isPrimary:true};
+    const down=el.dispatchEvent(new PointerEvent('pointerdown',{...pointer,buttons:1}));
+    if(!el.isConnected)return {ok:true,input:'pointer_sequence',clickDispatched:false};
+    if(down){el.dispatchEvent(new MouseEvent('mousedown',{...base,buttons:1}));el.focus({preventScroll:true});}
+    if(!el.isConnected)return {ok:true,input:'pointer_sequence',clickDispatched:false};
+    el.dispatchEvent(new PointerEvent('pointerup',{...pointer,buttons:0}));
+    if(down)el.dispatchEvent(new MouseEvent('mouseup',{...base,buttons:0}));
+    if(!el.isConnected)return {ok:true,input:'pointer_sequence',clickDispatched:false};
+    const top=document.elementFromPoint(x,y);
+    if(!top||!(top===el||el.contains(top))||el.matches(':disabled'))return {ok:false,code:'input_target_changed'};
+    el.click();return {ok:true,input:'pointer_sequence',clickDispatched:true};
   };
   if(location.origin!=='https://www.korail.com'||location.pathname!=='/ticket/search/list')return fail('wrong_page');
   if(!['select','verify','reserve'].includes(mode)||!['일반실','특실'].includes(seatClass))return fail('invalid_action');
@@ -40,7 +57,7 @@ export function searchAction({mode,key,seatClass}) {
     anchors[0].scrollIntoView({block:'center',behavior:'instant'});
     const rect=anchors[0].getBoundingClientRect(),top=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);
     if(!top||!(top===anchors[0]||anchors[0].contains(top)))return covered(top);
-    anchors[0].click();return {ok:true};
+    return press(anchors[0]);
   }
   const selected=[...document.querySelectorAll('.tckWrap .price_box.active')];
   if(selected.length!==1||selected[0]!==cell)return fail('selection_mismatch');
@@ -51,15 +68,15 @@ export function searchAction({mode,key,seatClass}) {
     buttons[0].scrollIntoView({block:'center',behavior:'instant'});
     const rect=buttons[0].getBoundingClientRect(),top=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);
     if(!top||!(top===buttons[0]||buttons[0].contains(top)))return covered(top);
-    const target={tag:'button',classes:['btn_bn-blue02','reservbtn'],text:'예매'};
-    buttons[0].click();return {ok:true,target};
+    const target={tag:buttons[0].tagName.toLowerCase(),classes:[...buttons[0].classList].filter(s=>/^[a-zA-Z_][a-zA-Z0-9_-]{0,60}$/.test(s)).slice(0,8),text:text(buttons[0])};
+    return {...press(buttons[0]),target};
   }
   return {ok:true};
 }
 
 // Compact structural diagnostics: no input values, full body text, ticket numbers or QR data.
 export function inspectBookingPage() {
-  const paths={'/ticket/search/list':'search','/ticket/login':'login','/ticket/reservation/detail':'reservation',
+  const paths={'/ticket/search/list':'search','/ticket/login':'login','/ticket/reservation/detail':'reservation','/ticket/reservation/list':'reservation_list',
     '/ticket/payment/payment':'payment','/ticket/myticket/list':'tickets'};
   if(location.origin!=='https://www.korail.com'||!paths[location.pathname])return {page:'unknown'};
   const page=paths[location.pathname];

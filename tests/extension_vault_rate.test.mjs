@@ -18,12 +18,12 @@ test('vault save failure does not overwrite previous encrypted data',async()=>{
   const s=storage();s.setItem('korail-card-vault-v1','original');
   await assert.rejects(saveCard(s,{},'short'));assert.equal(s.getItem('korail-card-vault-v1'),'original');
 });
-test('101st refresh waits past the rolling minute, including across instances',async()=>{
+test('121st refresh waits past the rolling minute, including across instances',async()=>{
   const s=storage(),calls=[];let time=0;
   const options={storage:s,locks:{request:async(_,fn)=>fn()},now:()=>time,sleep:async ms=>{time+=ms;},reload:async()=>calls.push(time)};
-  for(let i=0;i<101;i++)await limitedReload({...options});
-  assert.equal(calls[99],0);assert.equal(calls[100],60001);
-  for(const t of calls)assert.ok(calls.filter(x=>x>=t-60000&&x<=t).length<=100);
+  for(let i=0;i<121;i++)await limitedReload({...options});
+  assert.equal(calls[119],0);assert.equal(calls[120],60001);
+  for(const t of calls)assert.ok(calls.filter(x=>x>=t-60000&&x<=t).length<=120);
 });
 test('stop, deadline and malformed history cannot bypass rate cap',async()=>{
   const s=storage();let count=0;

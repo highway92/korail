@@ -2,11 +2,10 @@
 import {parseSnapshot} from './parser.js';
 
 export function validateSettings(s) {
-  for (const k of ['interval','timeout','errorDelay','errorMultiplier','errorMax','maxErrors','maxQueries','maxRuntime']) {
+  for (const k of ['interval','timeout','errorDelay','errorMultiplier','errorMax']) {
     if (typeof s[k]!=='number' || !Number.isFinite(s[k]) || s[k]<=0) throw new Error('invalid_settings');
   }
-  if (s.interval<0.65 || s.timeout<1 || s.timeout>120 || s.errorMultiplier<1 || s.errorMax<s.errorDelay ||
-      ['maxErrors','maxQueries'].some(k=>!Number.isInteger(s[k]))) throw new Error('invalid_settings');
+  if (s.interval<0.5 || s.timeout<1 || s.timeout>120 || s.errorMultiplier<1 || s.errorMax<s.errorDelay) throw new Error('invalid_settings');
   if (!Array.isArray(s.targets) || !s.targets.length || new Set(s.targets).size!==s.targets.length ||
       !Array.isArray(s.classes) || !s.classes.length || s.classes.some(c=>!['일반실','특실'].includes(c))) throw new Error('invalid_targets');
   if (!Array.isArray(s.preference) || (s.preference.length && (s.preference.length!==s.targets.length ||
@@ -24,12 +23,11 @@ export function chooseCandidate(trains,s,random=Math.random) {
   return {train,seatClass:classes[Math.floor(random()*classes.length)]};
 }
 
-export async function monitor({baseline,settings,refresh,read,sleep,signal,onEvent=()=>{},now=Date.now,random=Math.random}) {
+export async function monitor({baseline,settings,refresh,read,sleep,signal,onEvent=()=>{},random=Math.random}) {
   validateSettings(settings);
-  const start=now(),deadline=start+settings.maxRuntime*1000;
   let snapshot=baseline,queries=0,errors=0;
   const emit=(state,extra={})=>onEvent({state,queries,errors,...extra});
-  const stopped=()=>signal.aborted || now()>=deadline;
+  const stopped=()=>signal.aborted;
   const checkConditions=data=>{
     if (!data?.ok || ['date','departure','arrival','passengers'].some(k=>data.conditions?.[k]!==baseline.conditions?.[k])) throw new Error('conditions_changed');
   };
@@ -41,17 +39,16 @@ export async function monitor({baseline,settings,refresh,read,sleep,signal,onEve
     return trains;
   };
   const wait=async seconds=>{
-    await sleep(Math.max(0,Math.min(seconds*1000,deadline-now())),signal);
+    await sleep(seconds*1000,signal);
   };
   try {
-    if(stopped()) {emit(signal.aborted?'stopped':'time_limit');return;}
+    if(stopped()) {emit('stopped');return;}
     snapshot=await read();
     let trains=check(snapshot);
     for (;;) {
       if (stopped()) break;
       const candidate=chooseCandidate(trains,settings,random);
       if (candidate) {emit('found',{candidate});return;}
-      if (queries>=settings.maxQueries) {emit('query_limit');return;}
       emit('waiting',{delay:settings.interval,trains});
       await wait(settings.interval);
       if (stopped()) break;
@@ -65,7 +62,7 @@ export async function monitor({baseline,settings,refresh,read,sleep,signal,onEve
         const current=chooseCandidate(trains,settings,random);
         if (current) {emit('found',{candidate:current});return;}
         queries++;emit('querying');
-        const result=await refresh(snapshot,Math.min(settings.timeout*1000,deadline-now()),signal);
+        const result=await refresh(snapshot,settings.timeout*1000,signal);
         if (stopped()) break;
         if (!result.ok) throw new Error(result.code);
         snapshot=result.snapshot;trains=check(snapshot);errors=0;
@@ -73,14 +70,12 @@ export async function monitor({baseline,settings,refresh,read,sleep,signal,onEve
         if (stopped()) break;
         if (['conditions_changed','page_changed','missing_targets','wrong_page'].includes(error.message)) throw error;
         errors++;
-        if (errors>=settings.maxErrors) {emit('error_limit',{reason:error.message});return;}
-        if (queries>=settings.maxQueries) {emit('query_limit');return;}
         const delay=Math.min(settings.errorMax,settings.errorDelay*settings.errorMultiplier**(errors-1));
         emit('retry_wait',{delay,reason:error.message});
         await wait(delay);
       }
     }
-    emit(signal.aborted?'stopped':'time_limit');
+    emit('stopped');
   } catch(error) {
     emit(signal.aborted?'stopped':'needs_attention',{reason:error.message});
   }

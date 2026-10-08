@@ -13,12 +13,12 @@ function harness(overrides={}) {
   const events=[],waits=[],controller=new AbortController();
   const args={baseline:fixture,settings:{...defaults},signal:controller.signal,
     read:async()=>structuredClone(fixture),refresh:async()=>{reloads++;return {ok:true,snapshot:structuredClone(fixture)};},
-    sleep:async ms=>{waits.push(ms);time+=ms;},now:()=>time,onEvent:e=>events.push(e),...overrides};
+    sleep:async ms=>{waits.push(ms);time+=ms;},now:()=>time,onEvent:e=>{events.push(e);if(e.state==='waiting' && e.queries>=3)controller.abort();},...overrides};
   return {args,events,waits,controller,reloads:()=>reloads,run:()=>monitor(args)};
 }
-test('bounded sequential reloads use configured completion interval',async()=>{
+test('sequential reloads until stop use configured completion interval',async()=>{
   const h=harness();await h.run();assert.equal(h.reloads(),3);
-  assert.deepEqual(h.waits,[10000,10000,10000]);assert.equal(h.events.at(-1).state,'query_limit');
+  assert.deepEqual(h.waits,[10000,10000,10000,10000]);assert.equal(h.events.at(-1).state,'stopped');
 });
 test('manual condition change stops before reload',async()=>{
   const changed=structuredClone(fixture);changed.conditions.arrival='부산';
@@ -29,16 +29,16 @@ test('missing target is not sold out and stops',async()=>{
   const h=harness({settings:{...defaults,targets:['missing']}});await h.run();
   assert.equal(h.reloads(),0);assert.equal(h.events.at(-1).reason,'missing_targets');
 });
-test('stop during wait prevents reload; runtime limit clips wait',async()=>{
+test('stop during wait prevents reload; legacy runtime and query limits are ignored',async()=>{
   const h=harness();h.args.sleep=async()=>h.controller.abort();await h.run();
   assert.equal(h.reloads(),0);assert.equal(h.events.at(-1).state,'stopped');
-  const limited=harness({settings:{...defaults,maxRuntime:5}});await limited.run();
-  assert.deepEqual(limited.waits,[5000]);assert.equal(limited.reloads(),0);assert.equal(limited.events.at(-1).state,'time_limit');
+  const limited=harness({settings:{...defaults,maxRuntime:5,maxQueries:1}});await limited.run();
+  assert.deepEqual(limited.waits,[10000,10000,10000,10000]);assert.equal(limited.reloads(),3);assert.equal(limited.events.at(-1).state,'stopped');
 });
-test('errors back off and terminate without being labeled sold out',async()=>{
+test('errors back off until stopped without being labeled sold out',async()=>{
   const h=harness({refresh:async()=>({ok:false,code:'timeout'})});await h.run();
-  assert.deepEqual(h.waits,[10000,20000,10000,40000,10000]);
-  assert.equal(h.events.at(-1).state,'error_limit');assert.equal(h.events.at(-1).errors,3);
+  assert.deepEqual(h.waits,[10000,20000,10000,40000,10000,40000,10000]);
+  assert.equal(h.events.at(-1).state,'stopped');assert.equal(h.events.at(-1).errors,3);
 });
 test('candidate selection weights trains equally, honors order and excludes standing',()=>{
   const eligible=all.filter(t=>t.availableClasses.length);
@@ -59,11 +59,13 @@ test('an empty result after a failed refresh can be reloaded on retry',async()=>
   const empty={...fixture,status:'empty'};
   const h=harness({read:async()=>++reads===3?empty:fixture,refresh:async()=>++calls===1?
     {ok:false,code:'timeout'}:{ok:true,snapshot:fixture}});
-  await h.run();assert.equal(calls,3);assert.equal(h.events.at(-1).state,'query_limit');
+  await h.run();assert.equal(calls,3);assert.equal(h.events.at(-1).state,'stopped');
 });
 test('interval updates are applied on next wait and invalid numbers are rejected',async()=>{
-  const h=harness();h.args.onEvent=e=>{h.events.push(e);if(e.state==='querying')h.args.settings.interval=20;};
-  await h.run();assert.deepEqual(h.waits,[10000,20000,20000]);
+  const h=harness();h.args.onEvent=e=>{h.events.push(e);if(e.state==='querying')h.args.settings.interval=20;if(e.state==='waiting'&&e.queries>=3)h.controller.abort();};
+  await h.run();assert.deepEqual(h.waits,[10000,20000,20000,20000]);
   for(const n of [NaN,Infinity,0,-1])assert.throws(()=>validateSettings({...defaults,interval:n}));
   assert.throws(()=>validateSettings({...defaults,preference:['wrong']}));
 });
+
+test('continues beyond 6000 refreshes and two hours until explicit stop',async()=>{const h=harness();h.args.onEvent=e=>{h.events.push(e);if(e.state==='waiting'&&e.queries>=6001)h.controller.abort();};await h.run();assert.equal(h.reloads(),6001);assert.equal(h.events.at(-1).state,'stopped');});

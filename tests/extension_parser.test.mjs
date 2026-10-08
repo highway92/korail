@@ -49,3 +49,30 @@ test('duplicate identity is rejected',()=>{
   const a=fixture();a.structure.children[0].children.push(a.structure.children[0].children[0]);
   assert.throws(()=>parseSnapshot(a));
 });
+
+
+test('one-shot requires exactly one currently selected available seat',async()=>{
+  const {selectedCandidate}=await import('../extension/parser.js');
+  const fs=await import('node:fs');
+  const snapshot=JSON.parse(fs.readFileSync(new URL('./fixtures/korail-selected-discount.json',import.meta.url),'utf8'));
+  const c=selectedCandidate(snapshot);assert.equal(c.train.key.number,'403');assert.equal(c.seatClass,'일반실');
+  const walk=n=>{if(n.classes?.includes('active'))n.classes=n.classes.filter(c=>c!=='active');for(const child of n.children||[])walk(child);};
+  walk(snapshot.structure);assert.throws(()=>selectedCandidate(snapshot),/select_one_available_seat/);
+});
+
+
+test('one-shot selects an available class from exactly one checked train without an active price',async()=>{
+  const {selectedCandidate}=await import('../extension/parser.js');
+  const fs=await import('node:fs');
+  const snapshot=JSON.parse(fs.readFileSync(new URL('./fixtures/korail-selected-discount.json',import.meta.url),'utf8'));
+  const walk=n=>{n.classes=n.classes.filter(c=>c!=='active');for(const c of n.children)walk(c);};walk(snapshot.structure);
+  const train=parseSnapshot(snapshot).trains[0],opts={targetIds:[train.id],classes:['일반실','특실']};
+  assert.equal(selectedCandidate(snapshot,opts).seatClass,'일반실');
+  assert.throws(()=>selectedCandidate(snapshot,{...opts,targetIds:[]}),/select_exactly_one_train/);
+  assert.throws(()=>selectedCandidate(snapshot,{...opts,targetIds:[train.id,train.id]}),/select_exactly_one_train/);
+  assert.throws(()=>selectedCandidate(snapshot,{...opts,targetIds:['missing']}),/selected_train_missing/);
+  assert.throws(()=>selectedCandidate(snapshot,{...opts,classes:[]}),/select_seat_class/);
+  const unavailable=structuredClone(snapshot);
+  const sold=n=>{if(n.classes.includes('price_box'))n.classes.push('sold_out');for(const c of n.children)sold(c);};sold(unavailable.structure);
+  assert.throws(()=>selectedCandidate(unavailable,opts),/selected_train_unavailable/);
+});

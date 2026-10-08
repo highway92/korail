@@ -72,8 +72,11 @@ $('refresh').addEventListener('click',async()=>{
     const baseline=await readTab(tabId);
     if(!baseline?.ok) throw new Error('page_changed');
     $('status').textContent='탭을 한 번 새로고침한 뒤 목록을 기다립니다…';
-    const result=await probeRefresh({baseline,timeoutMs:seconds*1000,
+    const result=await navigator.locks.request('korail-booking-global',{ifAvailable:true},async lock=>{
+      if(!lock)throw new Error('macro_running');
+      return probeRefresh({baseline,timeoutMs:seconds*1000,
       reload:()=>limitedReload({reload:()=>chrome.tabs.reload(tabId),deadline:Date.now()+seconds*1000}),read:()=>readTab(tabId),sleep:ms=>new Promise(resolve=>setTimeout(resolve,ms))});
+    });
     if(result.snapshot) render(result.snapshot);
     const code=result.ok?'success':result.code;
     report={...report,refreshProbe:{status:code,timeoutSeconds:seconds,at:new Date().toISOString()}};

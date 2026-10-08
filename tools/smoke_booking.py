@@ -21,9 +21,16 @@ with sync_playwright() as p:
     page=browser.new_page()
     page.route('**/*',lambda r:r.fulfill(body=fixture,content_type='text/html;charset=utf-8'))
     page.goto('https://www.korail.com/ticket/search/list')
+    page.evaluate("""()=>{window.inputEvents=[];for(const t of ['pointerdown','mousedown','pointerup','mouseup','click'])document.querySelector('button.btn_bn-blue02').addEventListener(t,e=>window.inputEvents.push([e.type,e.isTrusted]));}""")
+    prepared=call(page,'searchAction',{**arg,'native':True})
+    assert prepared['ok'] and prepared['native'] is True
+    assert page.evaluate('[window.submits,window.wrong,window.inputEvents.length]')==[0,0,0]
+    assert page.evaluate("window.__korailNativeTarget.element.matches('button.btn_bn-blue02.reservbtn')")
     result=call(page,'searchAction',arg)
-    assert result['ok'] and result['target']['classes']==['btn_bn-blue02','reservbtn']
+    assert result['ok'] and set(result['target']['classes'])=={'btn_bn-blue02','reservbtn'}
     assert page.evaluate('[window.submits,window.wrong]')==[1,0]
+    assert page.evaluate('window.inputEvents')==[[t,False] for t in ['pointerdown','mousedown','pointerup','mouseup','click']]
+    assert result['input']=='pointer_sequence' and result['clickDispatched']
     page.evaluate("""()=>{document.documentElement.style.scrollBehavior='smooth';const cover=document.createElement('div');cover.id='cover';cover.className='modal-backdrop';cover.style='position:fixed;inset:0;z-index:999999';document.body.append(cover);}""")
     result=call(page,'searchAction',arg)
     assert result['code']=='covered_action' and result['blocker']['classes']==['modal-backdrop']
@@ -38,6 +45,11 @@ with sync_playwright() as p:
     assert call(page,'searchAction',{**arg,'mode':'verify'})['ok']
     page.locator('.price_box.gen').evaluate('(el)=>el.classList.add("sold_out")')
     assert call(page,'searchAction',arg)['code']=='seat_unavailable'
+    assert page.evaluate('window.submits')==1
+    page.locator('.price_box.gen').evaluate('(el)=>el.classList.remove("sold_out")')
+    page.locator('button.btn_bn-blue02').evaluate('(el)=>el.addEventListener("pointerdown",()=>el.remove())')
+    result=call(page,'searchAction',arg)
+    assert result['ok'] and result['clickDispatched'] is False
     assert page.evaluate('window.submits')==1
     page.goto('https://www.korail.com/ticket/payment/payment?token=URL_SECRET')
     page.set_content('<label for="card">신용카드 번호</label><input id="card" value="CARD_SECRET"><input type="password" value="PIN_SECRET"><input type="hidden" value="HIDDEN_SECRET"><button>결제/발권</button><p>결제가 완료되었습니다.</p><p>ACCOUNT_SECRET</p>')

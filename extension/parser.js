@@ -74,3 +74,22 @@ export function parseSnapshot(snapshot) {
 export function summarizeTargets(trains,times) {
   return times.map(time=>({time,matches:trains.filter(t=>t.key.time===time)}));
 }
+
+// Use the current website selection, never a random train from the monitor list.
+export function selectedCandidate(snapshot,options){
+  const trains=parseSnapshot(snapshot).trains;
+  if(options){
+    const {targetIds,classes}=options;
+    if(!Array.isArray(targetIds)||targetIds.length!==1)throw new Error('select_exactly_one_train');
+    if(!Array.isArray(classes)||!classes.length||classes.some(c=>!['일반실','특실'].includes(c)))throw new Error('select_seat_class');
+    const train=trains.find(t=>t.id===targetIds[0]);
+    if(!train)throw new Error('selected_train_missing');
+    const seats=train.seats.filter(s=>s.status==='available'&&classes.includes(s.seatClass));
+    if(!seats.length)throw new Error('selected_train_unavailable');
+    const seat=seats.find(s=>s.selected)||seats[0];
+    return {train,seatClass:seat.seatClass};
+  }
+  const selected=trains.flatMap(train=>train.seats.filter(seat=>seat.selected).map(seat=>({train,seat})));
+  if(selected.length!==1||selected[0].seat.status!=='available')throw new Error('select_one_available_seat');
+  return {train:selected[0].train,seatClass:selected[0].seat.seatClass};
+}

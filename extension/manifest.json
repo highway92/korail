@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "코레일 목록 확인",
-  "version": "0.9.4",
+  "version": "0.12.8",
   "description": "공개 열차 목록을 분석하고 설정한 간격으로 좌석을 확인합니다.",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "nativeMessaging", "downloads"],
   "action": {
     "default_title": "코레일 목록 확인",
     "default_popup": "popup.html"

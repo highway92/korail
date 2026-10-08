@@ -12,7 +12,7 @@ export async function limitedReload({reload,storage=localStorage,locks=navigator
       const history=JSON.parse(storage.getItem(key)||'[]');
       if(!Array.isArray(history)||history.some(t=>!Number.isFinite(t)))throw new Error('invalid_rate_history');
       const recent=history.filter(t=>t>=time-60000).sort((a,b)=>a-b);
-      if(recent.length>=100)return {wait:Math.max(1,recent[recent.length-100]+60001-time)};
+      if(recent.length>=120)return {wait:Math.max(1,recent[recent.length-120]+60001-time)};
       storage.setItem(key,JSON.stringify([...recent,time]));
       await reload();return {done:true};
     });
